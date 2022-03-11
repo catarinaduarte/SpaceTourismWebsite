@@ -1,0 +1,147 @@
+---
+import Layout from "../../layouts/Layout.astro"
+import Title from "../../components/Title.astro"
+import data from "../../data/data.json"
+
+export async function getStaticPaths() {
+    return data.destinations.map((d)=>{
+   
+        return{
+            params:{slug: d.name.toLowerCase()},
+            props:{post: d}
+        }
+    })
+}
+
+
+
+const {slug}= Astro.request.params
+const {name,images,description,distance,travel} = Astro.props.post
+
+let title = `Space Travel | ${name}`;
+let Metadescription = "Space Travel Project";
+const permalink = Astro.site.href;
+let canonicalURL = Astro.request.canonicalURL;
+
+// console.log("Slug: " + slug);
+// console.log("Name: " + name.toLowerCase());
+
+---
+<style>
+    main{
+        display: grid;
+        text-align: center;
+        column-gap: var(--container-gap, 2rem);
+        padding-inline: 2rem;
+        grid-template-areas:
+                "title"
+                "image"
+                "tabs"
+                "content";
+       
+        padding-bottom: 4rem;
+    }
+    .image{
+        grid-area: image;
+        max-width: 60%;
+        display: flex;
+        margin-inline: auto;
+        padding-bottom: 2rem;
+        
+    }
+    .content{
+        grid-area: content;
+    }
+    .tab-list{
+        grid-area: tabs;
+        justify-content: center;
+    }
+    a{
+        text-decoration: none;
+    }
+    p{
+        max-width: 50ch;
+        margin-inline: auto;
+    }
+    .destination-meta {
+    flex-direction: column;
+    border-top: 1px solid hsl(var(--light) / 0.1);
+    padding-top: 2.5rem;
+    margin-top: 2.5rem;
+    --gap: min(6vw, 6rem);
+    justify-content: center;
+    }
+    @media (min-width:23.5em){
+        .destination-meta{
+            flex-direction: row;
+        }
+        main{
+            --flow-space: 2rem;
+            grid-template-areas:
+                "title"
+                "image"
+                "tabs"
+                "content";
+                    }
+        .image{
+            padding-bottom: 3rem;
+        }
+    }
+    @media (min-width:48.1em){
+        main{
+            text-align: left;
+            grid-template-columns: 10rem 1fr 1fr 10rem;
+            grid-template-areas: 
+            ". title title ."
+            ". image tabs ."
+            ". image content ."
+        ;
+           justify-items: start;
+            align-content: start;
+        }
+        .image{
+            padding-top: 3rem;
+            max-width: 90%;
+            aspect-ratio: 1;
+            margin-inline: 0;
+            
+        }
+        .destination-meta{
+            justify-content: start;
+        }
+
+    }
+
+  
+</style>
+<Layout title={title} description={Metadescription} current={`destination`}  permalink={permalink} {canonicalURL}>
+    <main class="flow" id="main-content" aria-label="main">
+        <Title number="01" title="pick your destination"/>
+        <div class="image">
+            <img src={images.webp.substring(1)} alt={name}/>
+        </div>
+        <div class="tab-list underline-indicators d-flex" style="--underline-gap: 0.5rem">
+            {data.destinations.map((destination)=>{
+                return (
+                        <a class={`uppercase ff-sans-cond text-accent nav-space ${slug === destination.name.toLowerCase()?"active":""}`} href=`/destination/${destination.name.toLowerCase()}`>
+                            {destination.name}
+                        </a>
+                )
+            })}
+        </div>
+        <div class="content flow">
+            <h2 class="uppercase h2 ff-serif">{name}</h2>
+            <p class="text-accent">{description}</p>
+                <div class="destination-meta d-flex">
+                    <div>
+                        <h3 class="text-accent fs-200 uppercase s-h2">Avg. distance</h3>
+                        <p class="ff-serif uppercase s-h1">{distance}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-accent fs-200 uppercase s-h2">Est. travel time</h3>
+                        <p class="ff-serif uppercase s-h1">{travel}</p>
+                    </div>
+                </div>
+        </div>
+    </main>
+</Layout>

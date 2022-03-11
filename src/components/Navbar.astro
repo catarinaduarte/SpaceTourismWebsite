@@ -1,0 +1,165 @@
+---
+const navArray=[
+    {id:0,text:"home",url:"/"},
+    {id:1,text:"destination",url:"/destination/moon"},
+    {id:2,text:"crew",url:"/crew/douglas-hurley"},
+    {id:3,text:"technology",url:"/technology/launch-vehicle"},
+]
+
+const {current} = Astro.props
+---
+
+<!-- Style -->
+<style lang="scss">
+    img {
+        margin: 1.5rem clamp(1.5rem, 5vw, 3.5rem);
+    }
+    header{
+        align-items: center;
+        justify-content: space-between;
+    }
+    button {
+        display: none;
+    }
+    #primary-navigation{
+        --gap: clamp(1.5rem, 5vw, 3.5rem);
+        --underline-gap: 2rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        background: hsl(var(--dark) / 0.95);
+        /* backdrop-filter: blur(1rem); */
+        & a{
+            text-decoration: none;
+        }
+        & a > span{
+            font-weight: 700;
+            margin-right: .5em;
+        }
+    }
+
+    @media (max-width: 26em) {
+        button {
+            display: block;
+            position: absolute;
+            top: 2rem;
+            right: 1.5rem;
+            z-index: 2000;
+            background: transparent;
+            border: none;
+            /* background-image: url("./shared/icon-hamburger.svg"); */
+            /* background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='21'%3E%3Cg fill='%23D0D6F9' fill-rule='evenodd'%3E%3Cpath d='M0 0h24v3H0zM0 9h24v3H0zM0 18h24v3H0z'/%3E%3C/g%3E%3C/svg%3E"); */
+            /* background-repeat: no-repeat;
+            background-position: center; */
+            /* width: 1.5rem;
+            aspect-ratio: 1; */
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            &[aria-expanded="true"] {
+                /* background-image: url("./shared/icon-close.svg"); */
+                /* background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='21'%3E%3Cg fill='%23D0D6F9' fill-rule='evenodd'%3E%3Cpath d='M2.575.954l16.97 16.97-2.12 2.122L.455 3.076z'/%3E%3Cpath d='M.454 17.925L17.424.955l2.122 2.12-16.97 16.97z'/%3E%3C/g%3E%3C/svg%3E"); */
+            }
+            &:focus-visible{
+                outline: 5px solid white;
+                outline-offset: 5px;
+            }
+        }
+        #primary-navigation {
+            --underline-gap: .5rem;
+            position: fixed;
+            z-index: 1000;
+            inset: 0 0 0 30%;
+            padding: min(20rem, 15vh) 2rem;
+            margin: 0;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 500ms ease-in-out;
+            &[data-visible="true"]{
+                transform: translateX(0);
+            }
+            &.underline-indicators > .active{
+                border: 0;
+            }
+        }
+    }
+    @media (min-width: 26em) {
+        #primary-navigation {
+            padding-inline: clamp(3rem, 5vw, 7rem);
+        }
+    }
+
+    @media (min-width: 26em) and (max-width: 48.1em) {
+        #primary-navigation a > span {
+            display: none;
+        }
+    }
+    @media (min-width: 48.1em) {
+        header::after {
+            content: "";
+            display: block;
+            position: relative;
+            height: 1px;
+            background: hsl(var(--light) / 0.25);
+            order: 1;
+            width: 100%;
+            margin-right: -2.5rem;
+        }
+        nav {
+            order: 2;
+        }
+        #primary-navigation {
+            margin-block: 2rem;
+        }
+    }
+    @supports (backdrop-filter: blur(1rem)) {
+    #primary-navigation {
+        background: hsl(var(--light) / 0.05);
+        backdrop-filter: blur(1.5rem);
+    }
+    }
+
+</style>
+
+<!-- Markdown -->
+<header aria-label="navigation" class="d-flex">
+    <div>
+        <a href="/">
+            <img src="/assets/shared/logo.svg" alt="logo of space travel"/>
+        </a>
+    </div>
+    <button aria-expanded="false" aria-controls="primary-navigation">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25"><g fill="#D0D6F9" fill-rule="evenodd"><path d="M0 0h24v3H0zM0 9h24v3H0zM0 18h24v3H0z"/></g></svg>
+        <span class="sr-only" >Menu</span>
+    </button>
+    <nav>
+        <ul id="primary-navigation" class="underline-indicators d-flex" data-visible="false">
+            {navArray.map((navLi)=>{
+                return(
+                     <li class={`${current === navLi.text ? "active":""}`}>
+                        <a class="nav text-light uppercase ff-sans-cond nav-space" href={`${navLi.url}`}>
+                            <span aria-hidden="true">0{navLi.id}</span>{navLi.text}</a>
+                    </li>
+                )
+            })}
+        </ul>
+    </nav>
+</header>
+
+<!-- Javascript -->
+<script>
+const nav = document.querySelector("#primary-navigation");
+const navToggle = document.querySelector("button");
+
+navToggle.addEventListener("click", () => {
+  const visiblity = nav.getAttribute("data-visible");
+  if (visiblity === "false") {
+    nav.setAttribute("data-visible", true);
+    navToggle.setAttribute("aria-expanded", true);
+  } else {
+    nav.setAttribute("data-visible", false);
+    navToggle.setAttribute("aria-expanded", false);
+  }
+});
+
+</script>
